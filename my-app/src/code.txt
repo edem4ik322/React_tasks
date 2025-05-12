@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback, useContext, useTransition  } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { nanoid } from "nanoid";
 import uuid from "react-uuid";
 import User from "./User";
@@ -6,492 +6,13 @@ import { User1, User2, User3, User4 } from './User1';
 import Employee from "./Employee";
 import { styles } from './styles';
 import styled from 'styled-components';
-import { createContext } from 'react';
-
-const MyContext = createContext(null);
-
-const baseStyles = {
-  container: { padding: '20px', fontFamily: 'Arial' },
-  section: { marginBottom: '20px', border: '1px solid #ccc', padding: '10px', fontFamily: 'Arial' },
-  h1: { fontSize: '24px', margin: '10px 0' },
-  button: { margin: '5px', padding: '5px 10px' },
-  input: { margin: '5px', padding: '5px' },
-  nav: { display: 'flex', flexDirection: 'column' },
-  link: { textDecoration: 'none', color: 'blue', margin: '5px 0' },
-  activeLink: { fontWeight: 'bold', color: 'brown' },
-  control: { display: 'flex', gap: '10px' },
-  main: { display: 'flex', gap: '20px' },
-};
-
-const Container = styled.div`
-  width: 300px;
-  border: 2px solid black;
-  padding: 20px;
-  text-align: center;
-`;
-
-const Button1 = styled.button`
-  background-color: blue;
-  color: white;
-  padding: 10px 20px;
-  margin: 5px;
-  border: none;
-  cursor: pointer;
-`;
-
-const Button2 = styled(Button1)`
-  background-color: green;
-`;
-
-const Container1 = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 200px;
-  gap: 10px;
-`;
-
-const Button3 = styled.button`
-  padding: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  background-color: ${(props) => (props.disabled ? "gray" : "blue")};
-  color: white;
-  border: none;
-  border-radius: 5px;
-  opacity: ${(props) => (props.disabled ? 0.6 : 1)};
-`;
-
-const Button10511 = styled.button`
-  background-color: ${(props) => (props.$warn ? 'yellow' : 'green')};
-  color: ${(props) => (props.$warn ? 'red' : 'white')};
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-const DIVA_106_1 = styled.div`
-  width: 150px;
-  height: 150px;
-  background-color: yellow;
-  border: 2px solid;
-`;
-
-const DIVB_106_2 = styled(DIVA_106_1)`
-  background-color: green;
-  border-width: 3px;
-`;
-
-const Container1063 = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 150px;
-`;
+import { MyContext } from './MyContext.js';
+import Parent from './Parent';
 
 const initDate = {
   year: 2025,
   month: 12,
   day: 31,
-};
-
-const Task5 = () => {
-  const [username, setUsername] = useState('');
-  useEffect(() => {
-    localStorage.setItem('username_task5', username);
-  }, [username]);
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>5: Запись имени в localStorage</h1>
-        <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Введите имя"
-            style={baseStyles.input}
-        />
-        <p>Имя сохраняется в localStorage (ключ: username_task5)</p>
-      </div>
-  );
-};
-
-const Task6 = () => {
-  const [bgColor, setBgColor] = useState('white');
-  const [isBlockVisible, setIsBlockVisible] = useState(false);
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (sectionRef.current && sectionRef.current.contains(e.target)) {
-        setBgColor(bgColor === 'white' ? 'lightgray' : 'white');
-      }
-    };
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, [bgColor]);
-
-  const toggleBlock = (e) => {
-    e.stopPropagation();
-    setIsBlockVisible(!isBlockVisible);
-  };
-
-  return (
-      <div ref={sectionRef} style={{ ...baseStyles.section, backgroundColor: bgColor }}>
-        <h1 style={baseStyles.h1}>6: Смена фона и показ/скрытие блока</h1>
-        <p>Кликните внутри секции, чтобы сменить фон</p>
-        <button onClick={toggleBlock} style={baseStyles.button}>
-          {isBlockVisible ? 'Скрыть блок' : 'Показать блок'}
-        </button>
-        {isBlockVisible && (
-            <div style={{ background: 'lightblue', padding: '10px', marginTop: '10px' }}>
-              Этот блок показывается/скрывается по кнопке
-            </div>
-        )}
-      </div>
-  );
-};
-
-const Task9 = () => {
-  const Parent = () => <Daughter />;
-  const Daughter = () => {
-    const age = useContext(MyContext);
-    return (
-        <div>
-          <p>Возраст из контекста: {age}</p>
-          <Grandson />
-        </div>
-    );
-  };
-  const Grandson = () => {
-    const age = useContext(MyContext);
-    return <p>Возраст / 2: {age / 2}</p>;
-  };
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>9: Передача возраста через контекст</h1>
-        <MyContext.Provider value={42}>
-          <Parent />
-        </MyContext.Provider>
-      </div>
-  );
-};
-
-const Task10 = () => {
-  const [age, setAge] = useState(50);
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>10: Обновление контекста</h1>
-        <MyContext.Provider value={age}>
-          <p>Текущий возраст: {age}</p>
-          <button onClick={() => setAge(age - 2)} style={baseStyles.button}>
-            Уменьшить на 2
-          </button>
-        </MyContext.Provider>
-      </div>
-  );
-};
-
-const Task12 = () => {
-  const [textState, setTextState] = useState('text');
-  const [textRefDisplay, setTextRefDisplay] = useState('text');
-  const textRef = useRef('text');
-
-  const handleRefClick = () => {
-    textRef.current += '!';
-    setTextRefDisplay(textRef.current);
-  };
-
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>12: Добавление ! с useState и useRef</h1>
-        <p onClick={() => setTextState(textState + '!')} style={{ cursor: 'pointer' }}>
-          {textState} (useState, кликните)
-        </p>
-        <p>{textRefDisplay} (useRef)</p>
-        <button onClick={handleRefClick} style={baseStyles.button}>
-          Добавить ! (useRef)
-        </button>
-      </div>
-  );
-};
-
-const Task13 = () => {
-  const inputRef = useRef(null);
-  const handleFocusClear = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.value = '';
-    }
-  };
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>13: Фокус и очистка инпута</h1>
-        <input ref={inputRef} style={baseStyles.input} placeholder="Введите текст" />
-        <button onClick={handleFocusClear} style={baseStyles.button}>
-          Фокус и очистка
-        </button>
-      </div>
-  );
-};
-
-const Task14 = () => {
-  const [text, setText] = useState('react');
-  const [num, setNum] = useState(0);
-  const triple = (n) => {
-    let start = performance.now();
-    while (performance.now() - start < 500) {}
-    return n * 3;
-  };
-  const resultWithMemo = useMemo(() => triple(num), [num]);
-  const resultWithoutMemo = triple(num);
-
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>14: useMemo для оптимизации</h1>
-        <p onClick={() => setText(text + '!')} style={{ cursor: 'pointer' }}>
-          {text} (кликните)
-        </p>
-        <p onClick={() => setNum(num + 1)} style={{ cursor: 'pointer' }}>
-          Без useMemo: {resultWithoutMemo} (кликните)
-        </p>
-        <p onClick={() => setNum(num + 1)} style={{ cursor: 'pointer' }}>
-          С useMemo: {resultWithMemo} (кликните)
-        </p>
-      </div>
-  );
-};
-
-const Task15 = () => {
-  const [name, setName] = useState('');
-  const TextWithoutMemo = () => {
-    console.log('Text without memo rendered');
-    return <p>long text (без memo)</p>;
-  };
-  const TextWithMemo = React.memo(() => {
-    console.log('Text with memo rendered');
-    return <p>long text (с memo)</p>;
-  });
-
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>15: memo для предотвращения рендера</h1>
-        <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Введите имя"
-            style={baseStyles.input}
-        />
-        <TextWithoutMemo />
-        <TextWithMemo />
-        <p>Откройте консоль, чтобы увидеть разницу в рендеринге</p>
-      </div>
-  );
-};
-
-const Task16 = () => {
-  const [text, setText] = useState('text');
-  const [products, setProducts] = useState([]);
-  const addProductWithoutCallback = () => setProducts([...products, `Product ${products.length + 1}`]);
-  const addProductWithCallback = useCallback(() => setProducts((prev) => [...prev, `Product ${prev.length + 1}`]), []);
-
-  const ProductsWithoutMemo = ({ addItem }) => {
-    console.log('Products without memo rendered');
-    return (
-        <div>
-          <ul>{products.map((item, i) => <li key={i}>{item}</li>)}</ul>
-          <button onClick={addItem} style={baseStyles.button}>
-            Add Product (без memo)
-          </button>
-        </div>
-    );
-  };
-
-  const ProductsWithMemo = React.memo(({ addItem }) => {
-    console.log('Products with memo rendered');
-    return (
-        <div>
-          <ul>{products.map((item, i) => <li key={i}>{item}</li>)}</ul>
-          <button onClick={addItem} style={baseStyles.button}>
-            Add Product (с memo и useCallback)
-          </button>
-        </div>
-    );
-  });
-
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>16: useCallback для стабильной функции</h1>
-        <p onClick={() => setText(text + '!')} style={{ cursor: 'pointer' }}>
-          {text} (кликните)
-        </p>
-        <ProductsWithoutMemo addItem={addProductWithoutCallback} />
-        <ProductsWithMemo addItem={addProductWithCallback} />
-        <p>Откройте консоль, чтобы увидеть разницу в рендеринге</p>
-      </div>
-  );
-};
-
-const Task17 = () => {
-  const [isPending, startTransition] = useTransition();
-  const [filterTerm, setFilterTerm] = useState('');
-  const products = ['Product 1', 'Product 2', 'Item 3', 'Item 4'];
-  const filteredProducts = useMemo(
-      () => products.filter((p) => p.toLowerCase().includes(filterTerm.toLowerCase())),
-      [filterTerm]
-  );
-
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>17: useTransition для фильтрации</h1>
-        <input
-            value={filterTerm}
-            onChange={(e) => startTransition(() => setFilterTerm(e.target.value))}
-            placeholder="Фильтр продуктов"
-            style={baseStyles.input}
-        />
-        {isPending && <p>Обновление...</p>}
-        <ul>{filteredProducts.map((p, i) => <li key={i}>{p}</li>)}</ul>
-      </div>
-  );
-};
-
-const Task22_to_47 = () => {
-  const [pathname, setPathname] = useState('/');
-  const [students, setStudents] = useState([]);
-
-  const getStudent = (id) => students.find((s) => s.id === id) || null;
-
-  const createStudent = (e) => {
-    e.preventDefault();
-    const id = Math.random().toString(36).slice(2, 8);
-    const newStudent = { id, name: `Student ${id}` };
-    setStudents([newStudent, ...students]);
-    setPathname(`/students/${id}`);
-  };
-
-  const updateStudent = (id, updates) => {
-    setStudents(students.map((s) => (s.id === id ? { ...s, ...updates } : s)));
-    setPathname(`/students/${id}`);
-  };
-
-  const deleteStudent = (id) => {
-    setStudents(students.filter((s) => s.id !== id));
-    setPathname('/');
-  };
-
-  const Root = () => (
-      <div style={baseStyles.main}>
-        <div id="menu">
-          <form onSubmit={createStudent}>
-            <button type="submit" style={baseStyles.button}>Add Student</button>
-          </form>
-          {students.length ? (
-              <nav style={baseStyles.nav}>
-                {students.map((student) => (
-                    <a
-                        key={student.id}
-                        href={`/students/${student.id}`}
-                        style={pathname === `/students/${student.id}` ? baseStyles.activeLink : baseStyles.link}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPathname(`/students/${student.id}`);
-                        }}
-                    >
-                      {student.name || <i>Unnamed</i>}
-                    </a>
-                ))}
-              </nav>
-          ) : (
-              <p><i>No students here...</i></p>
-          )}
-        </div>
-      </div>
-  );
-
-  const Student = ({ student }) => (
-      <div>
-        <h2>Student Details</h2>
-        <p>Name: {student?.name || <i>unnamed</i>}</p>
-        <p>Surname: {student?.surname || <i>unknown</i>}</p>
-        <p>Year: {student?.year || <i>unknown</i>}</p>
-        <p>Specialty: {student?.specialty || <i>unknown</i>}</p>
-        <div style={baseStyles.control}>
-          <button onClick={() => setPathname(`/students/${student.id}/edit`)} style={baseStyles.button}>Edit</button>
-          <button onClick={() => deleteStudent(student.id)} style={baseStyles.button}>Delete</button>
-        </div>
-        <a href="/" style={baseStyles.link} onClick={(e) => { e.preventDefault(); setPathname('/'); }}>
-          Back to Home
-        </a>
-      </div>
-  );
-
-  const EditStudent = ({ student }) => {
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const updates = Object.fromEntries(formData);
-      updateStudent(student.id, updates);
-    };
-    return (
-        <form onSubmit={handleSubmit}>
-          <h2>Edit Student</h2>
-          <div>
-            <label>Name: </label>
-            <input defaultValue={student?.name} name="name" style={baseStyles.input} />
-          </div>
-          <div>
-            <label>Surname: </label>
-            <input defaultValue={student?.surname} name="surname" style={baseStyles.input} />
-          </div>
-          <div>
-            <label>Year: </label>
-            <input defaultValue={student?.year} name="year" style={baseStyles.input} />
-          </div>
-          <div>
-            <label>Specialty: </label>
-            <input defaultValue={student?.specialty} name="specialty" style={baseStyles.input} />
-          </div>
-          <button type="submit" style={baseStyles.button}>Save</button>
-          <a href={`/students/${student.id}`} style={baseStyles.link} onClick={(e) => { e.preventDefault(); setPathname(`/students/${student.id}`); }}>
-            Cancel
-          </a>
-        </form>
-    );
-  };
-
-  const Index = () => (
-      <div>
-        <p>Hi, React Router!</p>
-        <p>This is an application for my students :)</p>
-        <a href="/" style={baseStyles.link} onClick={(e) => { e.preventDefault(); setPathname('/'); }}>
-          Back to Home
-        </a>
-      </div>
-  );
-
-  const studentId = pathname.split('/')[2];
-  const currentStudent = getStudent(studentId);
-
-  return (
-      <div style={baseStyles.section}>
-        <h1 style={baseStyles.h1}>22-47: React Router</h1>
-        {pathname === '/' && <Root />}
-        {pathname === '/index' && <Index />}
-        {pathname.startsWith('/students/') && !pathname.endsWith('/edit') && currentStudent && <Student student={currentStudent} />}
-        {pathname.endsWith('/edit') && currentStudent && <EditStudent student={currentStudent} />}
-        {pathname.startsWith('/students/') && !currentStudent && !pathname.endsWith('/edit') && (
-            <div>
-              <h2>404 Not Found</h2>
-              <p>Студент не найден</p>
-              <a href="/" style={baseStyles.link} onClick={(e) => { e.preventDefault(); setPathname('/'); }}>
-                Back to Home
-              </a>
-            </div>
-        )}
-      </div>
-  );
 };
 
 function App() {
@@ -564,24 +85,24 @@ function App() {
   function t36_4_1(arg1, even, arg2) {
 		console.log(arg1, even, arg2);
 	}
-
-  const t37_1_1 = [
-    <li key="1">1</li>,
-    <li key="2">2</li>,
-    <li key="3">3</li>,
-    <li key="4">4</li>,
-    <li key="5">5</li>,
-  ];
+	const t37_1_1 = [
+		<li>1</li>,
+		<li>2</li>,
+		<li>3</li>,
+		<li>4</li>,
+		<li>5</li>,
+	];
 
   const t38_1_1 = [];
-  for (let i = 1; i <= 5; i++) {
-    t38_1_1.push(<li key={i}>{i}</li>);
-  }
+	for (let i = 1; i <= 5; i++) {
+		t38_1_1.push(<li>{i}</li>);
+	}
 
   const t39_1_1_1 = ['a', 'b', 'c', 'd', 'e'];
-  const t39_1_1_2 = t39_1_1_1.map(function(item, index) {
-    return <li key={index}>{item}</li>;
-  });
+
+	const t39_1_1_2 = t39_1_1_1.map(function(item) {
+		return <li>{item}</li>;
+	});
 
   const t40_1_1_1 = ['a', 'b', 'c', 'd', 'e'];
   const t40_1_1_2 = t40_1_1_1.map(function(item, s) {
@@ -643,7 +164,7 @@ function App() {
           <td>{item.name}</td>
           <td>{item.cost}</td>
         </tr>;
-  });
+  })
 
   const [t52_1_1] = useState('John');
   const [t52_1_2] = useState('Doe');
@@ -860,10 +381,11 @@ const [t53_1_1, setName] = useState('click btn');
     const [notes, setNotes] = useState([1, 2, 3, 4, 5]);
     const [inputValue, setInputValue] = useState('');
 
+    // Функция для добавления нового элемента в массив
     const addNote = () => {
       if (inputValue) {
         setNotes([...notes, inputValue]);
-        setInputValue('');
+        setInputValue(''); // очищаем поле после добавления
       }
     };
     const result = notes.map((note, index) => {
@@ -1058,20 +580,20 @@ const [t53_1_1, setName] = useState('click btn');
           )
         );
       };
-      const lastName1 = "Смирнов";
-      const firstName1 = "Алексей";
-      const patronymic1 = "Александрович";
-      const salary1 = "65000";
+      const lastName1 = "Иванов";
+      const firstName1 = "Иван";
+      const patronymic1 = "Иванович";
+      const salary1 = "50000";
 
-      const lastName2 = "Козлов";
-      const firstName2 = "Дмитрий";
-      const patronymic2 = "Сергеевич";
-      const salary2 = "70000";
+      const lastName2 = "Петров";
+      const firstName2 = "Петр";
+      const patronymic2 = "Петрович";
+      const salary2 = "60000";
 
-      const lastName3 = "Новиков";
-      const firstName3 = "Михаил";
-      const patronymic3 = "Игоревич";
-      const salary3 = "68000";
+      const lastName3 = "Сидоров";
+      const firstName3 = "Сидор";
+      const patronymic3 = "Сидорович";
+      const salary3 = "55000";
 
       const users1 = [
         { id: 1, name: "user1", surn: "surn1", age: 30 },
@@ -1149,25 +671,30 @@ const [t53_1_1, setName] = useState('click btn');
         });
       };
 
+  // Состояния с уникальными именами
   const [notes10_d, setNotes10_d] = useState([1, 2, 3, 4, 5]);
   const [value11_d, setValue11_d] = useState('');
   const [editIndex10_d, setEditIndex10_d] = useState(null);
-  const [sum10_d, setSum10_d] = useState(15);
+  const [sum10_d, setSum10_d] = useState(15); // Пример для суммы, если нужно
 
+  // Функция начала редактирования
   function startEdit10_d(index10_d) {
     setEditIndex10_d(index10_d);
     setValue11_d(notes10_d[index10_d]);
   }
 
+  // Функция изменения элемента
   function changeItem10_d(event10_d) {
     const updatedValue10_d = event10_d.target.value;
     setValue11_d(updatedValue10_d);
 
+    // Обновляем элемент в массиве
     const updatedNotes10_d = [...notes10_d];
     updatedNotes10_d[editIndex10_d] = updatedValue10_d;
     setNotes10_d(updatedNotes10_d);
   }
 
+  // Функция для обновления суммы (если нужно)
   function handleChange10_d(event10_d) {
     setValue11_d(event10_d.target.value);
   }
@@ -1177,6 +704,7 @@ const [t53_1_1, setName] = useState('click btn');
     setSum10_d(getSum10_d([...notes10_d, event10_d.target.value]));
   }
 
+  // Сумма элементов массива
   function getSum10_d(arr10_d) {
     return arr10_d.reduce((acc10_d, elem10_d) => acc10_d + Number(elem10_d), 0);
   }
@@ -1217,41 +745,194 @@ const [t53_1_1, setName] = useState('click btn');
   // Для второй кнопки:
   const bco2 = 'green';
 
+
+  const Container = styled.div`
+    width: 300px;
+    border: 2px solid black;
+    padding: 20px;
+    text-align: center;
+  `;
+
+  const Button1 = styled.button`
+    background-color: blue;
+    color: white;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    cursor: pointer;
+  `;
+
+  const Button2 = styled(Button1)`
+    background-color: green;
+  `;
+
+  const Container1 = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    gap: 10px;
+  `;
+
+  const Button3 = styled.button`
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: ${(props) => (props.disabled ? "gray" : "blue")};
+    color: white;
+    border: none;
+    border-radius: 5px;
+    opacity: ${(props) => (props.disabled ? 0.6 : 1)};
+  `;
+
+  const Button10511 = styled.button`
+    background-color: ${(props) => (props.warn ? 'yellow' : 'green')};
+    color: ${(props) => (props.warn ? 'red' : 'white')};
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  `;
+
+  const DIVA_106_1 = styled.div`
+    width: 150px;
+    height: 150px;
+    background-color: yellow;
+    border: 2px solid;
+  `;
+
+  const DIVB_106_2 = styled(DIVA_106_1)`
+    background-color: green;
+    border-width: 3px;
+  `;
+
+  const Container1063 = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+  `;
+
+// Задание 4 высший учебник
+  useEffect(() => {
+    document.title = "Новый заголовок страницы";
+  }, []);
+
+
+  const [color, setColor] = useState('white');
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    document.body.style.backgroundColor = color;
+  }, [color]);
+
+  useEffect(() => {
+    localStorage.setItem('username', username);
+  }, [username]);
+
+  const changeColor = () => {
+    setColor('blue');
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const [bgColor, setBgColor] = useState("white");
+
+  useEffect(() => {
+    const changeBackground = () => {
+      setBgColor(`#${Math.floor(Math.random() * 16777215).toString(16)}`);
+    };
+
+    document.addEventListener("click", changeBackground);
+
+    return () => {
+      document.removeEventListener("click", changeBackground);
+    };
+  }, []);
+
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const popupRef = useRef(null);
+
+  const closePopupOnClickOutside = (event) => {
+    if (popupRef.current && !popupRef.current.contains(event.target)) {
+      setIsPopupVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", closePopupOnClickOutside);
+    return () => {
+      document.removeEventListener("click", closePopupOnClickOutside);
+    };
+  }, []);
+
+  const [age2, setAge2] = useState(50);
+
+  const [text12, setText12] = useState('text');
+
+  function handleClick() {
+    setText12(text12 + '!');
+  }
+
+  const textRef12 = useRef('text');
+
+  function handleClick12() {
+    textRef12.current = textRef12.current + '!';
+    console.log('Текущий текст: ' + textRef12.current);
+  }
+
+  const ref13 = useRef(null);
+
+  function handleClick13() {
+    ref13.current.focus();
+    ref13.current.value = '';
+  }
   return (
       <>
 
-        <h1>Задание 7.1</h1>
+        <h1>7.1</h1>
         <div>
           NewText
         </div>
 
-        <h1>Задание 7.2</h1>
+        <h1>7.2</h1>
         <div>
           NewText
         </div>
         <div>NewText</div>
 
-        <h1>Задание 7.3</h1>
+        <h1>7.3</h1>
         <div className='test'>
           NewText
         </div>
         <div className='test2'>NewText</div>
 
-        <h1>Задание 8.1</h1>
+        <h1>8.1</h1>
         <ul>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => (
-              <li key={item}>{item}</li>
-          ))}
+          <li>1</li>
+          <li>2</li>
+          <li>3</li>
+          <li>4</li>
+          <li>5</li>
+          <li>6</li>
+          <li>7</li>
+          <li>8</li>
+          <li>9</li>
+          <li>10</li>
         </ul>
 
-        <h1>Задание 9.1</h1>
+        <h1>9.1</h1>
         <ul>
           <li>text1</li>
           <li>text2</li>
           <li>text3</li>
         </ul>
 
-        <h1>Задание 10.1</h1>
+        <h1>10.1</h1>
         <ul>
           <li>text1</li>
           <li>text2</li>
@@ -1263,19 +944,19 @@ const [t53_1_1, setName] = useState('click btn');
           <li>text3</li>
         </ul>
 
-        <h1>Задание 13.1</h1>
+        <h1>13.1</h1>
         <div>
           <p>{t13_1_1}</p>
           <p>{t13_1_2}</p>
         </div>
 
-        <h1>Задание 14.1</h1>
+        <h1>14.1</h1>
         <div>
           name: {t14_1_1}
           age: {t14_1_2}
         </div>
 
-        <h1>Задание 15.1</h1>
+        <h1>15.1</h1>
         <ul>
           <li>{t15_1_1[0]}</li>
           <li>{t15_1_1[1]}</li>
@@ -1284,33 +965,33 @@ const [t53_1_1, setName] = useState('click btn');
           <li>{t15_1_1[4]}</li>
         </ul>
 
-        <h1>Задание 16.1</h1>
+        <h1>16.1</h1>
         <p>
           name: <span>{t16_1_1.name}</span>,
           surname: <span>{t16_1_1.surname}</span>,
         </p>
 
-        <h1>Задание 17.1</h1>
+        <h1>17.1</h1>
         <div id={t17_1_1}>
           text
         </div>
 
-        <h1>Задание 19.1</h1>
+        <h1>19.1</h1>
         <ul>
           {t19_1_1}
           {t19_1_2}
           {t19_1_3}
         </ul>
 
-        <h1>Задание 20.1</h1>
+        <h1>20.1</h1>
         {t20_1_1}
 
-        <h1>Задание 21.1</h1>
+        <h1>21.1</h1>
         <div>
           <input/> <br/> <input/>
         </div>
 
-        <h1>Задание 23.1</h1>
+        <h1>23.1</h1>
         <div>
           <ul>
             <li>1</li>
@@ -1326,7 +1007,7 @@ const [t53_1_1, setName] = useState('click btn');
           </ul>
         </div>
 
-        <h1>Задание 23.2</h1>
+        <h1>23.2</h1>
         <div>
           <table>
             <tbody>
@@ -1349,26 +1030,26 @@ const [t53_1_1, setName] = useState('click btn');
           </table>
         </div>
 
-        <h1>Задание 24.1</h1>
+        <h1>24.1</h1>
         <div>
           {t24_1_1 + t24_1_2}
         </div>
 
-        <h1>Задание 24.2</h1>
+        <h1>24.2</h1>
         <div>
           result: {t24_2_1 + ' ' + t24_2_2}
         </div>
 
-        <h1>Задание 24.3</h1>
+        <h1>24.3</h1>
         <div>
           result: {Math.sqrt(t24_3_1)}
         </div>
 
-        <h1>Задание 26.1</h1>
+        <h1>26.1</h1>
         {t26_1_1_1}
         {t26_1_1_2}
 
-        <h1>Задание 27.1</h1>
+        <h1>27.1</h1>
         {t27_1_1 && (
             <div>
               <p>text</p>
@@ -1376,7 +1057,7 @@ const [t53_1_1, setName] = useState('click btn');
             </div>
         )}
 
-        <h1>Задание 28.1</h1>
+        <h1>28.1</h1>
         <div>
           {t28_1_1 > 18 ? (
               <p>Вы совершеннолетний, доступ разрешен.</p>
@@ -1385,33 +1066,33 @@ const [t53_1_1, setName] = useState('click btn');
           )}
         </div>
 
-        <h1>Задание 29.1</h1>
+        <h1>29.1</h1>
         <div>
           {t29_1_1 && <p>вы авторизованы</p>}
         </div>
 
-        <h1>Задание 30.1</h1>
+        <h1>30.1</h1>
         <div>
           {!t30_1_1 && <p>вы авторизованы</p>}
         </div>
 
-        <h1>Задание 31.1</h1>
+        <h1>31.1</h1>
         <div>{t31_1_1_sum}</div>
 
-        <h1>Задание 31.1</h1>
+        <h1>31.1</h1>
         <div>{t31_1_1_sum}</div>
 
-        <h1>Задание 32.1</h1>
+        <h1>32.1</h1>
         <p>{t32_1_1_sum}</p>
 
-        <h1>Задание 33.1</h1>
+        <h1>33.1</h1>
         <div>
           <button onClick={t33_1_1_1}>act1</button>
           <button onClick={t33_1_1_2}>act2</button>
         </div>
         ;
 
-        <h1>Задание 34.1</h1>
+        <h1>34.1</h1>
         <div>
           <button onClick={t34_1_1_1}>act1</button>
           <button onClick={t34_1_1_2}>act2</button>
@@ -1419,52 +1100,52 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
         ;
 
-        <h1>Задание 35.1</h1>
+        <h1>35.1</h1>
         <button onClick={t35_1_1}>click</button>
 
-        <h1>Задание 35.2</h1>
+        <h1>35.2</h1>
         <button onClick={t35_1_2}>click</button>
 
-        <h1>Задание 36.2</h1>
+        <h1>36.2</h1>
         <button onClick={() => t36_2_1('eee', 'yyy')}>act</button>
 
-        <h1>Задание 36.3</h1>
+        <h1>36.3</h1>
         <button onClick={(even) => t36_3_1(even, 'eee', 'yyy')}>act</button>
 
-        <h1>Задание 36.4</h1>
+        <h1>36.4</h1>
         <button onClick={(even) => t36_4_1('eee', even, 'yyy')}>act</button>
 
-        <h1>Задание 37.1</h1>
+        <h1>37.1</h1>
         <ul>
           {t37_1_1}
         </ul>
 
-        <h1>Задание 38.1</h1>
+        <h1>38.1</h1>
         <ul>
           {t38_1_1}
         </ul>
 
-        <h1>Задание 39.1</h1>
+        <h1>39.1</h1>
         <ul>
           {t39_1_1_2}
         </ul>
 
-        <h1>Задание 40.1</h1>
+        <h1>40.1</h1>
         <ul>
           {t40_1_1_2}
         </ul>
 
-        <h1>Задание 41.1</h1>
+        <h1>41.1</h1>
         <ul>
           {t41_1_1_2}
         </ul>
 
-        <h1>Задание 42.1</h1>
+        <h1>42.1</h1>
         <ul>
           {t42_1_1_2}
         </ul>
 
-        <h1>Задание 43.1</h1>
+        <h1>43.1</h1>
         <table>
           <thead>
           <tr>
@@ -1478,25 +1159,25 @@ const [t53_1_1, setName] = useState('click btn');
           </tbody>
         </table>
 
-        <h1>Задание 47.1</h1>
+        <h1>47.1</h1>
         <div>
           <h2>Random ID (nanoid):</h2>
           <p>{t47_1_1}</p>
         </div>
 
-        <h1>Задание 48.1</h1>
+        <h1>48.1</h1>
         <div>
           <h2>Random ID (nanoid):</h2>
           <p>{t48_1_1()}</p>
         </div>
 
-        <h1>Задание 48.2</h1>
+        <h1>48.2</h1>
         <div>
           <h2>Random ID (uuid):</h2>
           <p>{t48_1_2()}</p>
         </div>
 
-        <h1>Задание 49.1</h1>
+        <h1>49.1</h1>
         <table>
           <thead>
           <tr>
@@ -1510,42 +1191,42 @@ const [t53_1_1, setName] = useState('click btn');
           </tbody>
         </table>
 
-        <h1>Задание 52.1</h1>
+        <h1>52.1</h1>
         <div>
           <span>{t52_1_1} </span>
           <span>{t52_1_2} </span>
           <span>{t52_1_3}</span>
         </div>
 
-        <h1>Задание 53.1</h1>
+        <h1>53.1</h1>
         <div>
           <span>{t53_1_1}</span> <br/>
           <button onClick={t53_1_2}>btn(123x)</button>
           <button onClick={t53_1_3}>btn(x321)</button>
         </div>
 
-        <h1>Задание 54.1</h1>
+        <h1>54.1</h1>
         <div>
           <span>{t54_1_1 ? 'banned' : 'not banned'}</span> <br/>
           <button onClick={() => setBan(true)}>ban</button>
           <button onClick={() => setBan(false)}>unban</button>
         </div>
 
-        <h1>Задание 54.2</h1>
+        <h1>54.2</h1>
         <div>
           <span>{t54_2_1 ? 'banned' : 'not banned'}</span> <br/>
           {!t54_2_1 && (<button onClick={() => setBan2(true)}>ban</button>)}
           {t54_2_1 && (<button onClick={() => setBan2(false)}>unban</button>)}
         </div>
 
-        <h1>Задание 55.1</h1>
+        <h1>55.1</h1>
         <div>
           <span>{t55_1_1}</span> <br/>
           <button onClick={() => setAge(t55_1_1 + 1)}>+</button>
           <button onClick={() => setAge(t55_1_1 > 0 ? t55_1_1 - 1 : t55_1_1)}>-</button>
         </div>
 
-        <h1>Задание 56.1</h1>
+        <h1>56.1</h1>
         <div>
           <input t56_1_1={t56_1_1} onChange={event => setText1(event.target.value)}/>
           <input t56_1_2={t56_1_2} onChange={event => setText2(event.target.value)}/>
@@ -1553,26 +1234,26 @@ const [t53_1_1, setName] = useState('click btn');
           <p>text: {t56_1_2}</p>
         </div>
 
-        <h1>Задание 57.1</h1>
+        <h1>57.1</h1>
         <div>
           <input value={t57_1_1} onChange={t57_1_2}/>
           <p>Количество символов: {t57_1_1.length}</p>
         </div>
 
-        <h1>Задание 58.1</h1>
+        <h1>58.1</h1>
         <div>
           <input value={t58_1_1} onChange={t58_1_2}/>
           <p>Год рождения: {2025 - t58_1_1}</p>
         </div>
 
 
-        <h1>Задание 58.2</h1>
+        <h1>58.2</h1>
         <div>
           <input value={t58_2_1} onChange={t58_2_2}/>
           <p>Фаренгейты в цельсиях: {((t58_2_1 - 32) * 5) / 9}</p>
         </div>
 
-        <h1>Задание 59.1</h1>
+        <h1>59.1</h1>
         <div>
           <input type="number" value={t59_1_1} onChange={handleChange1}/>
           <input type="number" value={t59_1_2} onChange={handleChange2}/>
@@ -1582,7 +1263,7 @@ const [t53_1_1, setName] = useState('click btn');
           <p>Среднее арифметическое: {t59_1_1_1}</p>
         </div>
 
-        <h1>Задание 60.1</h1>
+        <h1>60.1</h1>
         <div>
           <input value={t60_1_1} onChange={event => setValue6(event.target.value)}/>
           <input value={t60_1_2} onChange={event => setValue7(event.target.value)}/>
@@ -1592,7 +1273,7 @@ const [t53_1_1, setName] = useState('click btn');
           <p>result: {t60_1_3}</p>
         </div>
 
-        <h1>Задание 60.2</h1>
+        <h1>60.2</h1>
         <div>
           <input type="date" value={t60_2_1} onChange={(e) => setT60_2_1(e.target.value)}/>
           <input type="date" value={t60_2_2} onChange={(e) => setT60_2_2(e.target.value)}/>
@@ -1600,7 +1281,7 @@ const [t53_1_1, setName] = useState('click btn');
           <p>Разница в днях: {t60_2_3 !== null ? t60_2_3 : 'Введите даты и нажмите кнопку'}</p>
         </div>
 
-        <h1>Задание 60.3</h1>
+        <h1>60.3</h1>
         <div>
           <input type="date" value={t60_3_1} onChange={(e) => setT60_3_1(e.target.value)}/>
           <input type="date" value={t60_3_2} onChange={(e) => setT60_3_2(e.target.value)}/>
@@ -1608,38 +1289,38 @@ const [t53_1_1, setName] = useState('click btn');
           <p>Разница в днях: {t60_3_3 !== null ? t60_3_3 : 'Введите даты и нажмите кнопку'}</p>
         </div>
 
-        <h1>Задание 60.4</h1>
+        <h1>60.4</h1>
         <div>
           <input type="number" value={t60_4_1} onChange={(e) => setT60_4_1(e.target.value)} onBlur={handleBlur}/>
           <p>Сумма цифр: {t60_4_2}</p>
         </div>
 
-        <h1>Задание 60.5</h1>
+        <h1>60.5</h1>
         <div>
           <input type="number" value={t60_5_1} onChange={(e) => setT60_5_1(e.target.value)} onBlur={handleBlur1}/>
           <p>Произведение делителей: {t60_5_2}</p>
         </div>
 
-        <h1>Задание 61.1</h1>
+        <h1>61.1</h1>
         <div>
           <textarea value={t60_6_1} onChange={handleChange_1}/>
           <p>{toTranslit_1(t60_6_1)}</p>
         </div>
 
-        <h1>Задание 61.2</h1>
+        <h1>61.2</h1>
         <div>
           <textarea value={t60_6_2} onChange={handleChange_2}/>
           <p>Сумма: {sumNumbers_2(t60_6_2)}</p>
         </div>
 
-        <h1>Задание 62.1</h1>
+        <h1>62.1</h1>
         <div>
           <input type="checkbox" checked={t62_1_1_checked} onChange={() => t62_1_1_setChecked(!t62_1_1_checked)}/>
           <button onClick={t62_1_2_handleClick}>Кликни меня</button>
           <p>{t62_1_1_message}</p>
         </div>
 
-        <h1>Задание 62.2</h1>
+        <h1>62.2</h1>
         <div>
           <label>
             <input type="checkbox" checked={t62_2_1_htmlChecked}
@@ -1664,7 +1345,7 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 63.1</h1>
+          <h1>63.1</h1>
           <input type="checkbox" checked={t63_1_1_checked} onChange={() => t63_1_1_setChecked(!t63_1_1_checked)}/>
           <div>
             {t63_1_1_checked ? (
@@ -1681,13 +1362,13 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 63.2</h1>
+          <h1>63.2</h1>
           <input type="checkbox" checked={t63_2_1_checked} onChange={() => t63_2_1_setChecked(!t63_2_1_checked)}/>
           <div>{t63_2_1_checked && <p>Этот абзац видим только если чекбокс отмечен</p>}</div>
         </div>
 
         <div>
-          <h1>Задание 64.1</h1>
+          <h1>64.1</h1>
           <select value={t64_1_1_value} onChange={t64_1_2_handleChange}>
             <option value="Не ври, точно не Казань">Казань</option>
             <option value="Сочи">Сочи</option>
@@ -1699,7 +1380,7 @@ const [t53_1_1, setName] = useState('click btn');
 
 
         <div>
-          <h1>Задание 65.1</h1>
+          <h1>65.1</h1>
           <select value={t65_1_1_value} onChange={(event) => t65_1_1_setValue(event.target.value)}>
             {t65_1_2_options}
           </select>
@@ -1707,7 +1388,7 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 66.1</h1>
+          <h1>66.1</h1>
           <select value={t66_1_1_value} onChange={(event) => t66_1_1_setValue(event.target.value)}>
             <option value="0-12">от 0 до 12 лет</option>
             <option value="13-17">от 13 до 17 лет</option>
@@ -1723,7 +1404,7 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 68.1</h1>
+          <h1>68.1</h1>
           <input
               type="radio"
               name="radio"
@@ -1749,7 +1430,7 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 68.2</h1>
+          <h1>68.2</h1>
           <input
               type="radio"
               name="language"
@@ -1784,7 +1465,7 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 71</h1>
+          <h1>71</h1>
           <p>
             Год: {date.year}, Месяц: {date.month}, День: {date.day}, День
             недели: {getDayOfWeek(date.year, date.month, date.day)}
@@ -1795,7 +1476,7 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 72</h1>
+          <h1>72</h1>
           <ul>
             {result}
           </ul>
@@ -1807,7 +1488,7 @@ const [t53_1_1, setName] = useState('click btn');
           <button onClick={addNote}>Добавить</button>
         </div>
 
-        <h1>Задание 74.1</h1>
+        <h1>74.1</h1>
         <div>
           <ul>
             {t74_1_1.map((t74_1_4, t74_1_5) => (
@@ -1818,7 +1499,7 @@ const [t53_1_1, setName] = useState('click btn');
           </ul>
         </div>
 
-        <h1>Задание 74.2</h1>
+        <h1>74.2</h1>
         <div>
           <ul>
             {t74_2_1.map((t74_2_4, t74_2_5) => (
@@ -1830,7 +1511,7 @@ const [t53_1_1, setName] = useState('click btn');
           </ul>
         </div>
 
-        <h1>Задание 74.3</h1>
+        <h1>74.3</h1>
         <div>
           <ul>
             {t74_3_1.map((t74_3_4, t74_3_5) => (
@@ -1842,7 +1523,7 @@ const [t53_1_1, setName] = useState('click btn');
           <input value={t74_3_2} onChange={(e) => sett74_3_2(e.target.value)}/>
         </div>
 
-        <h1>Задание 74.4</h1>
+        <h1>74.4</h1>
         <div>
           <ul>
             {t74_4_1.map((t74_4_7, t74_4_8) => (
@@ -1857,7 +1538,7 @@ const [t53_1_1, setName] = useState('click btn');
               onBlur={t74_4_5}
           />
         </div>
-        <h1>Задание 74.5</h1>
+        <h1>74.5</h1>
         <div>
           <ul>
             {t74_5_1.map((t74_5_3, t74_5_4) => (
@@ -1867,7 +1548,7 @@ const [t53_1_1, setName] = useState('click btn');
           <button onClick={t74_5_2}>Перевернуть порядок</button>
         </div>
 
-        <h1>Задание 75.1</h1>
+        <h1>75.1</h1>
         <div>
           <ul>
             {t75_1_1.map((t75_1_4) => (
@@ -1881,7 +1562,7 @@ const [t53_1_1, setName] = useState('click btn');
           <button onClick={t75_1_2}>Добавить элемент</button>
         </div>
 
-        <h1>Задание 75.2</h1>
+        <h1>75.2</h1>
         <div>
           <ul>
             {t75_2_1.map((t75_2_7) => (
@@ -1910,7 +1591,7 @@ const [t53_1_1, setName] = useState('click btn');
           <button onClick={t75_2_5}>Добавить элемент</button>
         </div>
 
-        <h1>Задание 76.1</h1>
+        <h1>76.1</h1>
         <div>
           <ul>
             {t76_1_1.map((t76_1_4) => (
@@ -1923,7 +1604,7 @@ const [t53_1_1, setName] = useState('click btn');
             ))}
           </ul>
         </div>
-        <h1>Задание 76.2</h1>
+        <h1>76.2</h1>
         <div>
           <ul>
             {t76_2_1.map((t76_2_8) => (
@@ -1939,7 +1620,7 @@ const [t53_1_1, setName] = useState('click btn');
           <input value={t76_2_3} readOnly/>
           <input value={t76_2_4} readOnly/>
         </div>
-        <h1>Задание 76.3</h1>
+        <h1>76.3</h1>
         <div>
           <ul>
             {t76_3_1.map((t76_3_11) => (
@@ -1957,7 +1638,7 @@ const [t53_1_1, setName] = useState('click btn');
           <button onClick={t76_3_9}>Обновить li</button>
         </div>
 
-        <h1>Задание 77.1</h1>
+        <h1>77.1</h1>
         <div>
           {t77_1_1.map((t77_1_6) => (
               <p key={t77_1_6.id}>
@@ -1970,26 +1651,26 @@ const [t53_1_1, setName] = useState('click btn');
           ))}
         </div>
 
-        <h1>Задание 79.1</h1>
+        <h1>79.1</h1>
         <div>
           <User/>
         </div>
 
-        <h1>Задание 80.1</h1>
+        <h1>80.1</h1>
         <div>
           <User/>
           <User/>
           <User/>
         </div>
 
-        <h1>Задание 81.1</h1>
+        <h1>81.1</h1>
         <div>
-          <Employee lastName="Смирнов" firstName="Алексей" patronymic="Александрович" salary="65000"/>
-          <Employee lastName="Козлов" firstName="Дмитрий" patronymic="Сергеевич" salary="70000"/>
-          <Employee lastName="Новиков" firstName="Михаил" patronymic="Игоревич" salary="68000"/>
+          <Employee lastName="Иванов" firstName="Иван" patronymic="Иванович" salary="50000"/>
+          <Employee lastName="Петров" firstName="Петр" patronymic="Петрович" salary="60000"/>
+          <Employee lastName="Сидоров" firstName="Сидор" patronymic="Сидорович" salary="55000"/>
         </div>
 
-        <h1>Задание 82.1</h1>
+        <h1>82.1</h1>
         <div>
           <Employee
               lastName={lastName1}
@@ -2011,7 +1692,7 @@ const [t53_1_1, setName] = useState('click btn');
           />
         </div>
 
-        <h1>Задание 83.1</h1>
+        <h1>83.1</h1>
         <div>
           <table border="1">
             <thead>
@@ -2029,7 +1710,7 @@ const [t53_1_1, setName] = useState('click btn');
           </table>
         </div>
 
-        <h1>Задание 84.1</h1>
+        <h1>84.1</h1>
         <div>
           <table border="1">
             <thead>
@@ -2043,16 +1724,16 @@ const [t53_1_1, setName] = useState('click btn');
           </table>
         </div>
 
-        <h1>Задание 85.1</h1>
+        <h1>85.1</h1>
         <div>{userList1}</div>
         ;
 
-        <h1>Задание 86.1</h1>
+        <h1>86.1</h1>
         <div>{userItems}</div>
         ;
 
 
-        <h1>Задание 87.1</h1>
+        <h1>87.1</h1>
         <div>
           {users4.map(user4 => (
               <User4
@@ -2067,7 +1748,7 @@ const [t53_1_1, setName] = useState('click btn');
           ))}
         </div>
 
-        <h1>Задание 96.1</h1>
+        <h1>96.1</h1>
         <div>
           <label>
             Температура в Фаренгейтах:
@@ -2088,12 +1769,12 @@ const [t53_1_1, setName] = useState('click btn');
         </div>
 
         <div>
-          <h1>Задание 96.2</h1>
+          <h1>96.2</h1>
           <div>
             <p>{sum10_d}</p>
             <input value={value11_d} onChange={handleChange10_d} onBlur={handleBlur10_d}/>
           </div>
-          <h1>Задание 96.3</h1>
+          <h1>96.3</h1>
           <div>
             {notes10_d.map((note10_d, index10_d) => (
                 <p key={index10_d} onClick={() => startEdit10_d(index10_d)}>
@@ -2104,25 +1785,25 @@ const [t53_1_1, setName] = useState('click btn');
           </div>
         </div>
 
-        <h1>Задание 99.1</h1>
+        <h1>99.1</h1>
         <div className="class1">
           <button className="class2">Button 1</button>
           <button className="class3">Button 2</button>
         </div>
 
-        <h1>Задание 99.2</h1>
+        <h1>99.2</h1>
         <div style={class1}>
           <button style={class2}>Button 1</button>
           <button style={class3}>Button 2</button>
         </div>
 
-        <h1>Задание 100.1</h1>
+        <h1>100.1</h1>
         <div style={styles.class1}>
           <button style={styles.class2}>Button 1</button>
           <button style={styles.class3}>Button 2</button>
         </div>
 
-        <h1>Задание 101.1</h1>
+        <h1>101.1</h1>
         <div style={{
           width: '300px',
           border: '2px solid black',
@@ -2147,7 +1828,7 @@ const [t53_1_1, setName] = useState('click btn');
           </button>
         </div>
 
-        <h1>Задание 102.1</h1>
+        <h1>102.1</h1>
         <div style={{
           width: wd1,
           border: br1,
@@ -2172,57 +1853,138 @@ const [t53_1_1, setName] = useState('click btn');
           </button>
         </div>
 
-        <h1>Задание 103.1</h1>
+        <h1>103.1</h1>
         <Container>
           <Button1>Button 1</Button1>
           <Button2>Button 2</Button2>
         </Container>
 
-        <h1>Задание 104.1</h1>
+        <h1>104.1</h1>
         <Container1>
           <Button3 disabled>Disabled Button</Button3>
           <Button3>Normal Button</Button3>
           <Button3 type="reset">Reset Button</Button3>
         </Container1>
 
-        <h1>Задание 105.1</h1>
+        <h1>105.1</h1>
         <div>
           <Button10511>Normal Button</Button10511>
-          <Button10511 $warn>Warning Button</Button10511>
+          <Button10511 warn="true">Warning Button</Button10511>
         </div>
 
-        <h1>Задание 106</h1>
+        <h1>106</h1>
         <Container1063>
           <DIVA_106_1>DIV A</DIVA_106_1>
           <DIVB_106_2>DIV B</DIVB_106_2>
           <DIVA_106_1>DIV A</DIVA_106_1>
         </Container1063>
 
-        <h1>Высший учебник React</h1>
-        <div style={baseStyles.container}>
-          <Task5/>
-          <Task6/>
-          <Task9/>
-          <Task10/>
-          <Task12/>
-          <Task13/>
-          <Task14/>
-          <Task15/>
-          <Task16/>
-          <Task17/>
-          <Task22_to_47/>
+        <div>
+          <h1>Высший учебник</h1>
+          <h1>5</h1>
+          <button onClick={changeColor}>Сменить цвет фона</button>
+
+          <div style={{marginTop: '20px'}}>
+            <input
+                type="text"
+                value={username}
+                onChange={handleUsernameChange}
+                placeholder="Введите имя пользователя"
+            />
+            <p>Имя пользователя: {username}</p>
+          </div>
         </div>
 
+        <h1>6</h1>
+        <div
+            style={{
+              width: "100vw",
+              height: "100vh",
+              backgroundColor: bgColor,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+        >
+          <h1>Кликните в любое место, чтобы сменить фон</h1>
+        </div>
+
+        <h1>7</h1>
+        <div style={{padding: "20px"}}>
+          <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPopupVisible(true);
+              }}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "blue",
+                cursor: "pointer",
+                textDecoration: "underline",
+                fontSize: "16px",
+              }}
+          >
+            Показать блок
+          </button>
+
+          {isPopupVisible && (
+              <div
+                  ref={popupRef}
+                  style={{
+                    marginTop: "10px",
+                    padding: "20px",
+                    background: "lightblue",
+                    width: "200px",
+                    borderRadius: "8px",
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+              >
+                Кликните вне этого блока, чтобы его скрыть
+              </div>
+          )}
+        </div>
+
+        <h1>8.1</h1>
+        <MyContext.Provider value={42}>
+          <Parent/>
+        </MyContext.Provider>
+
+        <h1>9</h1>
+        <MyContext.Provider value={age2}>
+          <Parent/>
+          <button onClick={() => setAge2(age2 - 2)}>Уменьшить возраст на 2</button>
+          {}
+        </MyContext.Provider>
+
+        <h1>12</h1>
+        <div>
+          <p>{text12}</p>
+          <button onClick={handleClick}>Добавить !</button>
+        </div>
+
+        <div>
+          <p>{textRef12.current}</p>
+          <button onClick={handleClick12}>Добавить !</button>
+        </div>
+
+        <h1>13</h1>
+        <div>
+          <input ref={ref13}/>
+          <button onClick={handleClick13}>focus</button>
+        </div>
       </>
   );
 
 
 }
 
+// Функция для конвертации из Фаренгейта в Цельсий
 function fahrenheitToCelsius(fahrenheit) {
   return (fahrenheit - 32) * (5 / 9);
 }
 
+// Функция для конвертации из Цельсия в Фаренгейт
 function celsiusToFahrenheit(celsius) {
   return celsius * (9 / 5) + 32;
 }
